@@ -1,0 +1,7 @@
+---
+# default vars
+
+ps_user: zabbix
+ps_path: /etc/zabbix/scripts
+ps_cache_dir: /tmp
+ps_admins: []

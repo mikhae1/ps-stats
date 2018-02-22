@@ -1,0 +1,40 @@
+---
+# tasks file for nd-clone
+
+- name: add admins to {{ ps_user }} group
+  user:
+    name: "{{ item }}"
+    append: yes
+    groups: "{{ ps_user }}"
+  with_items: "{{ ps_admins }}"
+
+- name: prepare {{ ps_path }} directory
+  file:
+    path: "{{ ps_path }}"
+    state: directory
+    mode: 0775
+
+- name: prepare {{ ps_path }}/ps-stats directory
+  file:
+    path: "{{ ps_path }}/ps-stats"
+    state: directory
+    owner: "{{ ps_user }}"
+    group: "{{ ps_user }}"
+    mode: 0775
+
+- name: copy script
+  copy:
+    src: ps-stats.rb
+    dest: "{{ ps_path }}/ps-stats/ps-stats.rb"
+    owner: "{{ ps_user }}"
+    group: "{{ ps_user }}"
+    mode: 0775
+
+- name: update zabbix config
+  template:
+    src: templates/userparameter_ps-stats.conf.j2
+    dest: /etc/zabbix/zabbix_agentd.d/userparameter_ps-stats.conf
+    owner: "{{ ps_user }}"
+    group: "{{ ps_user }}"
+    mode: 0664
+  notify: restart zabbix agent
